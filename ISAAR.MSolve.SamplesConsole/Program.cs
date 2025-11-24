@@ -411,121 +411,141 @@ namespace ISAAR.MSolve.SamplesConsole
         //{
         //    SolveHexaSoil();
         //}
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            DateTime begin = DateTime.Now;
-            readMatrixData("input1.txt", out Stoch1);
-            readMatrixData("input2.txt", out Stoch2);
-            readMatrixData("input3.txt", out Stoch3);
-            Console.WriteLine("Provide the initial index. Dont forget we have zero indexing.");
-            indexbegin = Int32.Parse(Console.ReadLine());
-            Console.WriteLine("Provide the final index.");
-            montecarlosim = Int32.Parse(Console.ReadLine());
-            StreamWriter writer;
-            TextWriter oldOut = Console.Out;
-            writer = File.CreateText("Output.txt");
-            writer.AutoFlush = true;
-            Console.SetOut(writer);
-            d1 = new double[montecarlosim + 5];
-            d2 = new double[montecarlosim + 5];
-            l1 = new double[montecarlosim + 5];
-            r1 = new double[montecarlosim + 5];
-            for (int index=indexbegin;index<montecarlosim;index++)
-            { 
-                      double lambda = 0.0;
-                if(index>-1 && index<10)
-                {
-                    lambda = 100.0;
-                }
-                else if (index > 9 && index < 11)
-                {
-                    lambda = 120;
-                }
-                else if (index > 10 && index < 15)
-                {
-                    lambda = 100;
-                }
-                else 
-                {
-                    lambda = 120;
-                }
-                double lambdaprev = 1.1 * lambda;
-                      double maxlambdaofnofailure = 0.0;
-                      double thislambdac = lambda;
-                      double previouslambdac = 0.0;
-                      bool isfirstiter = true;
-                      hasfailed = false;
-                      while (!(hasfailed == true && Math.Abs((thislambdac - previouslambdac) / thislambdac) < 0.01))
-                      {
-                          if (hasfailed == true)
-                          {
-                              lambdaprev = lambda;
-                              if (maxlambdaofnofailure == 0)
-                              {
-                                  lambda = 0.5 * (lambda * stepoffail / 1000.0 + lambdaprev);
-                              }
-                              else
-                              {
-                                  lambda = 0.5 * (maxlambdaofnofailure + lambdaprev);
-                              }
-                          }
-                          else
-                          {
-                              if (isfirstiter)
-                              {
-                                  isfirstiter = false;
-                              }
-                              else
-                              {
-                                  if (maxlambdaofnofailure != 0 && maxlambdaofnofailure < lambda)
-                                  {
-                                      maxlambdaofnofailure = lambda;
-                                  }
-                                  if (maxlambdaofnofailure == 0)
-                                  {
-                                      maxlambdaofnofailure = lambda;
-                                      lambda = 0.5 * (lambda + lambdaprev);
-                                  }
-                                  else
-                                  {
-                                      lambda = 0.5 * (maxlambdaofnofailure + lambdaprev);
-                                  }
-                              }
-                          }
-                          Debug.WriteLine("Previous Lambda {0} Current Lambda {1}", lambdaprev, lambda);
-                          hasfailed = false;
-                          SolveStochasticHexaSoil(index, readMatrixDataPartially(Stoch1, index, index, 0, 7), readMatrixDataPartially(Stoch2, index, index, 0, 7), readMatrixDataPartially(Stoch3, index, index, 0, 7), readMatrixDataPartially(Stoch3, 0, 7, 8, 8), lambda);
-                          if (hasfailed == true)
-                          {
-                              previouslambdac = thislambdac;
-                              thislambdac = lambdaprev;
-                          }
-                      }
-                      CollectMonteCarloFailDetails(lambda);
-                  };
-            //for (int i = 0; i < 1; i++)
-            //{
-            //    SolveStochasticHexaSoil(1, Stoch1[1], Stoch2[1]);
-            //}
-            //Parallel.For(0, montecarlosim-1,
-            //      index =>
-            //      {
-            //          SolveStochasticHexaSoil(index, Stoch1[index], Stoch2[index], readMatrixDataPartially(Stoch3, index, index, 0, 7), readMatrixDataPartially(Stoch3, 0, 7, 8, 8));
-            //          Console.WriteLine(index);
-            //      });
-            DateTime end = DateTime.Now;
-            writeTime(begin, end);
-            statistics(d1);
-            statistics(d2);
-            statistics(r1);
-            statistics(l1);
-            writeData(d1, 1, "maxdisplacements.txt");
-            writeData(d2, 1, "mindisplacements.txt");
-            writeData(r1, 1, "rotations.txt");
-            writeData(l1, 1, "failloads.txt");
-            Console.SetOut(oldOut);
-            writer.Close();
+            //Program2.RunStochasticAnalysis(args);
+            Program.RunAnalysis(args);
         }
+
+        public static void RunAnalysis(string[] args)
+        {
+			DateTime begin = DateTime.Now;
+			string currentDir = Environment.CurrentDirectory;
+			string projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\.."));
+			string resourcesDir = Path.Combine(projectDir, "Resources", "Soil");
+			readMatrixData(Path.Combine(resourcesDir, "input1.txt"), out Stoch1);
+			readMatrixData(Path.Combine(resourcesDir, "input2.txt"), out Stoch2);
+			readMatrixData(Path.Combine(resourcesDir, "input3.txt"), out Stoch3);
+			indexbegin = 1;
+			montecarlosim = 4;
+
+			//readMatrixData("input1.txt", out Stoch1);
+			//readMatrixData("input2.txt", out Stoch2);
+			//readMatrixData("input3.txt", out Stoch3);
+			//Console.WriteLine("Provide the initial index. Dont forget we have zero indexing.");
+			//indexbegin = Int32.Parse(Console.ReadLine());
+			//Console.WriteLine("Provide the final index.");
+			//montecarlosim = Int32.Parse(Console.ReadLine());
+
+			StreamWriter writer;
+			TextWriter oldOut = Console.Out;
+			writer = File.CreateText("Output.txt");
+			writer.AutoFlush = true;
+			Console.SetOut(writer);
+			d1 = new double[montecarlosim + 5];
+			d2 = new double[montecarlosim + 5];
+			l1 = new double[montecarlosim + 5];
+			r1 = new double[montecarlosim + 5];
+			for (int index = indexbegin; index < montecarlosim; index++) //ΕΔΩ. Παραλληλοποιησε αυτη τη Monte Carlo
+			{
+                Debug.WriteLine("Monte Carlo analysis " + index);
+                Console.WriteLine("Monte Carlo analysis " + index);
+
+				double lambda = 0.0;
+				if (index > -1 && index < 10)
+				{
+					lambda = 100.0;
+				}
+				else if (index > 9 && index < 11)
+				{
+					lambda = 120;
+				}
+				else if (index > 10 && index < 15)
+				{
+					lambda = 100;
+				}
+				else
+				{
+					lambda = 120;
+				}
+				double lambdaprev = 1.1 * lambda;
+				double maxlambdaofnofailure = 0.0;
+				double thislambdac = lambda;
+				double previouslambdac = 0.0;
+				bool isfirstiter = true;
+				hasfailed = false;
+				while (!(hasfailed == true && Math.Abs((thislambdac - previouslambdac) / thislambdac) < 0.01))
+				{
+					if (hasfailed == true)
+					{
+						lambdaprev = lambda;
+						if (maxlambdaofnofailure == 0)
+						{
+							lambda = 0.5 * (lambda * stepoffail / 1000.0 + lambdaprev);
+						}
+						else
+						{
+							lambda = 0.5 * (maxlambdaofnofailure + lambdaprev);
+						}
+					}
+					else
+					{
+						if (isfirstiter)
+						{
+							isfirstiter = false;
+						}
+						else
+						{
+							if (maxlambdaofnofailure != 0 && maxlambdaofnofailure < lambda)
+							{
+								maxlambdaofnofailure = lambda;
+							}
+							if (maxlambdaofnofailure == 0)
+							{
+								maxlambdaofnofailure = lambda;
+								lambda = 0.5 * (lambda + lambdaprev);
+							}
+							else
+							{
+								lambda = 0.5 * (maxlambdaofnofailure + lambdaprev);
+							}
+						}
+					}
+					Debug.WriteLine("Previous Lambda {0} Current Lambda {1}", lambdaprev, lambda);
+					hasfailed = false;
+					SolveStochasticHexaSoil(index, readMatrixDataPartially(Stoch1, index, index, 0, 7), readMatrixDataPartially(Stoch2, index, index, 0, 7), readMatrixDataPartially(Stoch3, index, index, 0, 7), readMatrixDataPartially(Stoch3, 0, 7, 8, 8), lambda);
+					if (hasfailed == true)
+					{
+						previouslambdac = thislambdac;
+						thislambdac = lambdaprev;
+					}
+				}
+				CollectMonteCarloFailDetails(lambda);
+			}
+			;
+			//for (int i = 0; i < 1; i++)
+			//{
+			//    SolveStochasticHexaSoil(1, Stoch1[1], Stoch2[1]);
+			//}
+			//Parallel.For(0, montecarlosim-1,
+			//      index =>
+			//      {
+			//          SolveStochasticHexaSoil(index, Stoch1[index], Stoch2[index], readMatrixDataPartially(Stoch3, index, index, 0, 7), readMatrixDataPartially(Stoch3, 0, 7, 8, 8));
+			//          Console.WriteLine(index);
+			//      });
+			DateTime end = DateTime.Now;
+			writeTime(begin, end);
+			statistics(d1);
+			statistics(d2);
+			statistics(r1);
+			statistics(l1);
+			writeData(d1, 1, "maxdisplacements.txt");
+			writeData(d2, 1, "mindisplacements.txt");
+			writeData(r1, 1, "rotations.txt");
+			writeData(l1, 1, "failloads.txt");
+			Console.SetOut(oldOut);
+			writer.Close();
+		}
         #endregion
     }
 }

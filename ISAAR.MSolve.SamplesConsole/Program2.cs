@@ -219,21 +219,24 @@ namespace ISAAR.MSolve.SamplesConsole
             //stresstoch[samplenumber] = StressesCheck;
         }
         #endregion
-        //static void Main(string[] args)
-        //{
-        //    SolveHexaSoil();
-        //}
-        static void Main(string[] args)
+        public static void RunStochasticAnalysis(string[] args)
         {
             DateTime begin = DateTime.Now;
-            readData("input1.txt", out Stoch1);
-            readData("input2.txt", out Stoch2);
-            readMatrixData("input3.txt", out Stoch3);
-            readData("timefun.txt", out increments);
-            Console.WriteLine("Provide the initial index. Dont forget we have zero indexing.");
-            indexbegin = Int32.Parse(Console.ReadLine());
-            Console.WriteLine("Provide the final index.");
-            montecarlosim = Int32.Parse(Console.ReadLine());
+            string currentDir = Environment.CurrentDirectory;
+            string projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\.."));
+            string resourcesDir = Path.Combine(projectDir, "Resources", "Soil");
+			readData(Path.Combine(resourcesDir, "input1.txt"), out Stoch1);
+			readData(Path.Combine(resourcesDir, "input2.txt"), out Stoch2);
+			readMatrixData(Path.Combine(resourcesDir, "input3.txt"), out Stoch3);
+			//readData(Path.Combine(resourcesDir, "timefun.txt"), out increments);
+            //Console.WriteLine("Provide the initial index. Dont forget we have zero indexing.");
+            //indexbegin = Int32.Parse(Console.ReadLine());
+            //Console.WriteLine("Provide the final index.");
+            //montecarlosim = Int32.Parse(Console.ReadLine());
+            indexbegin = 1;
+            montecarlosim = 4;
+
+
             dispstoch = new double[montecarlosim - indexbegin];
             dispstoch150 = new double[montecarlosim - indexbegin];
             stresstoch = new double[montecarlosim - indexbegin];
