@@ -85,6 +85,7 @@ namespace ISAAR.MSolve.Solvers.Direct
             watch.Start();
             factorization.SolveLinearSystem(linearSystem.RhsConcrete, linearSystem.SolutionConcrete);
             watch.Stop();
+            //Console.WriteLine("Completed linear system solution");
             Logger.LogTaskDuration("Back/forward substitutions", watch.ElapsedMilliseconds);
             Logger.IncrementAnalysisStep();
         }

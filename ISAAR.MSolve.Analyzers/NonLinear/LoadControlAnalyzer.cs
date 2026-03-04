@@ -38,7 +38,9 @@ namespace ISAAR.MSolve.Analyzers.NonLinear
                 int iteration = 0;
                 for (iteration = 0; iteration < maxIterationsPerIncrement; iteration++)
                 {
-                    if (iteration==0)
+                    //Debug.WriteLine($"Load control iteration {increment}.{iteration}");
+                    //Console.WriteLine($"Load control iteration {increment}.{iteration}");
+					if (iteration==0)
                     {
                         internalRhsVectors = CalculateInternalRhsatfirstiteration(increment, iteration);
                         double residualNormCurrentfirstiter = UpdateResidualForcesAndNormatfirstiteration(increment, internalRhsVectors);

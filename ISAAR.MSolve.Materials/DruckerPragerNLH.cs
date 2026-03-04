@@ -715,7 +715,7 @@ namespace ISAAR.MSolve.Materials
                 dgamma = 0;
                 hasconverged = true;
             }
-            while (!hasconverged)
+            while (!hasconverged) //TODO Serafeim: edw kollaei
             {
                 cohesion = GetYieldBackStressFromPlasticStrain(this.plasticStrain + dgamma*this.ksi, this.IsotropicHardeningCurve);
                 phi = Math.Sqrt(GetJ2(StressesTrial)) - this.shearModulus * dgamma + this.ni * (this.ptrial - bulk * this.nipaula * dgamma) - this.ksi * cohesion;

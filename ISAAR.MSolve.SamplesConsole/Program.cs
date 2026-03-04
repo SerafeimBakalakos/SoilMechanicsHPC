@@ -1,27 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using ISAAR.MSolve.Analyzers;
 using ISAAR.MSolve.Analyzers.Dynamic;
+using ISAAR.MSolve.Analyzers.Interfaces;
+using ISAAR.MSolve.Analyzers.NonLinear;
 using ISAAR.MSolve.Discretization.FreedomDegrees;
 using ISAAR.MSolve.FEM.Entities;
+using ISAAR.MSolve.LinearAlgebra;
 using ISAAR.MSolve.Logging;
+using ISAAR.MSolve.PreProcessor;
+using ISAAR.MSolve.PreProcessor.Materials;
 using ISAAR.MSolve.Problems;
 using ISAAR.MSolve.Solvers;
 using ISAAR.MSolve.Solvers.Direct;
-using ISAAR.MSolve.LinearAlgebra;
 using MGroup.Stochastic;
 using MGroup.Stochastic.Structural;
 using MGroup.Stochastic.Structural.Example;
-using ISAAR.MSolve.Analyzers.NonLinear;
-using ISAAR.MSolve.PreProcessor;
-using ISAAR.MSolve.PreProcessor.Materials;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using ISAAR.MSolve.Analyzers.Interfaces;
-using System.Diagnostics;
 
 namespace ISAAR.MSolve.SamplesConsole
 {
@@ -196,8 +197,9 @@ namespace ISAAR.MSolve.SamplesConsole
         #region readwritemethods
         public static void readData(string DataFileName, out double[] array)
         {
+			var format = CultureInfo.GetCultureInfo("el-GR");
             string dataLine;
-            string[] dataFields;
+			string[] dataFields;
             string[] numSeparators1 = { ":" };
             string[] numSeparators2 = { " " };
             StreamReader rStream;
@@ -211,7 +213,7 @@ namespace ISAAR.MSolve.SamplesConsole
             {
                 dataLine = rStream.ReadLine();
                 dataFields = dataLine.Split(numSeparators1, StringSplitOptions.RemoveEmptyEntries);
-                array[i] = double.Parse(dataFields[0]);
+                array[i] = double.Parse(dataFields[0], format);
             }
             rStream.Close();
 
@@ -293,7 +295,8 @@ namespace ISAAR.MSolve.SamplesConsole
         }
         public static void readMatrixData(string DataFileName, out double[,] array)
         {
-            string dataLine;
+			var format = CultureInfo.GetCultureInfo("el-GR");
+			string dataLine;
             string[] dataFields;
             string[] numSeparators1 = { ":" };
             string[] numSeparators2 = { " " };
@@ -314,7 +317,7 @@ namespace ISAAR.MSolve.SamplesConsole
                 dataFields = dataLine.Split(numSeparators1, StringSplitOptions.RemoveEmptyEntries);
                 for (int j = 0; j < dim1; j++)
                 {
-                    array1[i, j] = double.Parse(dataFields[j]);
+                    array1[i, j] = double.Parse(dataFields[j], format);
                 }
             }
             rStream.Close();
@@ -371,11 +374,11 @@ namespace ISAAR.MSolve.SamplesConsole
 
             var provider = new ProblemPorous(model, solver);
             LibrarySettings.LinearAlgebraProviders = LinearAlgebraProviderChoice.MKL;
+            //LibrarySettings.LinearAlgebraProviders = LinearAlgebraProviderChoice.Managed;
 
-            int increments = 1;
+            int increments = 1000;
             var childAnalyzerBuilder = new LoadControlAnalyzer.Builder(model, solver, provider, increments);
             childAnalyzerBuilder.ResidualTolerance = 1E-5;
-            childAnalyzerBuilder.MaxIterationsPerIncrement = 100;
             childAnalyzerBuilder.NumIterationsForMatrixRebuild = 1;
             LoadControlAnalyzer childAnalyzer = childAnalyzerBuilder.Build();
             var parentAnalyzerBuilder = new NewmarkDynamicAnalyzer.Builder(model, solver, provider, childAnalyzer, 0.001, 1);

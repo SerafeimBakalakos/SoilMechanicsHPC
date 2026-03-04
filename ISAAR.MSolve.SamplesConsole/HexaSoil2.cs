@@ -394,9 +394,9 @@ namespace ISAAR.MSolve.SamplesConsole
 
             double nodalLoad = 0.0;
             double phideg = 60.0;
-            double totalDuration = 1;
-            double timeStepDuration = 0.001;
-            double constantsegmentdurationratio = 1;
+            double totalDuration = 0.1; // Originally 1.0
+            double timeStepDuration = 0.01; // Originally 0.001
+			double constantsegmentdurationratio = 1;
             GeneralDynamicNodalLoad loadinitialz;
             nodalLoad = 0.0;
             foreach (Node nodecheck in model.NodesDictionary.Values)
